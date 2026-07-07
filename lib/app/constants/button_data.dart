@@ -3,7 +3,7 @@ import '../../modules/calculator/model/button_model.dart';
 const buttons = [
 
   ButtonModel(text: "AC", isOperator: true),
-  ButtonModel(text: "()", isOperator: true),
+  ButtonModel(text: "⌫", isOperator: true),
   ButtonModel(text: "%", isOperator: true),
   ButtonModel(text: "÷", isOperator: true),
 
