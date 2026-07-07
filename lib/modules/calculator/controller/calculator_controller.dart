@@ -1,14 +1,16 @@
 import 'package:get/get.dart';
-
-import '../../../data/services/calculator_service.dart';
+import '../../../core/services/calculator_service.dart';
+import '../../history/controller/history_controller.dart';
 
 class CalculatorController extends GetxController {
   final CalculatorService _service = CalculatorService();
+  final HistoryController historyController = Get.find<HistoryController>();
 
   final RxString expression = ''.obs;
   final RxString result = '0'.obs;
+  final RxDouble memoryValue = 0.0.obs;
 
-  final List<String> _operators = ['+', '-', '×', '÷'];
+  static const List<String> _operators = ['+', '-', '×', '÷'];
 
   void onButtonPressed(String value) {
     switch (value) {
@@ -30,6 +32,39 @@ class CalculatorController extends GetxController {
 
       case '%':
         percentage();
+        break;
+      case 'MC':
+        memoryClear();
+        break;
+
+      case 'MR':
+        memoryRecall();
+        break;
+
+      case 'M+':
+        memoryAdd();
+        break;
+
+      case 'M-':
+        memorySubtract();
+        break;
+
+    // Scientific Functions
+      case 'π':
+      case 'e':
+      case '√':
+      case 'x²':
+      case 'xʸ':
+      case 'sin':
+      case 'cos':
+      case 'tan':
+      case 'log':
+      case 'ln':
+        _service.handleScientific(
+          value,
+          expression,
+          result,
+        );
         break;
 
       default:
@@ -63,7 +98,7 @@ class CalculatorController extends GetxController {
       return;
     }
 
-    String last = expression.value[expression.value.length - 1];
+    final last = expression.value[expression.value.length - 1];
 
     if (_operators.contains(last)) {
       expression.value =
@@ -76,7 +111,7 @@ class CalculatorController extends GetxController {
   //================ LIVE RESULT ===================
 
   void _liveCalculate() {
-    String value = _service.evaluate(expression.value);
+    final value = _service.evaluate(expression.value);
 
     if (value != "Error") {
       result.value = value;
@@ -86,11 +121,16 @@ class CalculatorController extends GetxController {
   //================ CALCULATE ===================
 
   void calculate() {
-    String value = _service.evaluate(expression.value);
+    final value = _service.evaluate(expression.value);
 
     result.value = value;
 
     if (value != "Error") {
+      historyController.addHistory(
+        expression.value,
+        value,
+      );
+
       expression.value = value;
     }
   }
@@ -111,7 +151,7 @@ class CalculatorController extends GetxController {
         expression.value.substring(0, expression.value.length - 1);
 
     if (expression.value.isEmpty) {
-      result.value = "0";
+      result.value = '0';
       return;
     }
 
@@ -141,15 +181,37 @@ class CalculatorController extends GetxController {
 
     _liveCalculate();
   }
+  void memoryClear() {
+    memoryValue.value = 0;
+  }
 
-  //================ DECIMAL CHECK ===================
+  void memoryRecall() {
+    expression.value = memoryValue.value.toString();
+    result.value = expression.value;
+  }
+
+  void memoryAdd() {
+    final value = double.tryParse(result.value);
+    if (value != null) {
+      memoryValue.value += value;
+    }
+  }
+
+  void memorySubtract() {
+    final value = double.tryParse(result.value);
+    if (value != null) {
+      memoryValue.value -= value;
+    }
+  }
+
+  //================ DECIMAL ===================
 
   bool _currentNumberContainsDecimal() {
-    String text = expression.value;
+    final text = expression.value;
 
-    int index = text.lastIndexOf(RegExp(r'[+\-×÷]'));
+    final index = text.lastIndexOf(RegExp(r'[+\-×÷]'));
 
-    String number = index == -1 ? text : text.substring(index + 1);
+    final number = index == -1 ? text : text.substring(index + 1);
 
     return number.contains('.');
   }
