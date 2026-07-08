@@ -41,8 +41,8 @@ class ScientificPanel extends GetView<CalculatorController> {
         builder: (context, constraints) {
           final crossAxisCount = isLandscape ? 3 : 5;
 
-          final rows =
-          (scientificButtons.length / crossAxisCount).ceil();
+          // final rows =
+          // (scientificButtons.length / crossAxisCount).ceil();
 
           // final buttonWidth =
           //     (constraints.maxWidth -
