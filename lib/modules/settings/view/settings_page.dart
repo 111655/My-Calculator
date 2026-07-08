@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../app/theme/app_theme_type.dart';
 import '../controller/settings_controller.dart';
 import '../controller/theme_controller.dart';
 
@@ -15,10 +16,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   final ThemeController themeController = Get.find<ThemeController>();
   final settingsController = Get.find<SettingsController>();
-  bool haptic = true;
-  bool sound = false;
-  String decimal = "Auto";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,22 +27,76 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(16),
         children: [
           /// Appearance
+          /// Appearance
           Card(
             elevation: 2,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            child: Obx(
-                  () => SwitchListTile(
-                secondary: Icon(
-                  themeController.isDarkMode.value
-                      ? Icons.dark_mode
-                      : Icons.light_mode,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Obx(
+                    () => Column(
+                  children: [
+                    const ListTile(
+                      leading: Icon(Icons.palette_outlined),
+                      title: Text(
+                        "Appearance",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("☀ Light"),
+                      value: AppThemeType.light,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("🌙 Dark"),
+                      value: AppThemeType.dark,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("💙 Blue"),
+                      value: AppThemeType.blue,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("💜 Purple"),
+                      value: AppThemeType.purple,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("💚 Green"),
+                      value: AppThemeType.green,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+
+                    RadioListTile<AppThemeType>(
+                      title: const Text("⚫ AMOLED Black"),
+                      value: AppThemeType.amoled,
+                      groupValue: themeController.selectedTheme.value,
+                      onChanged: (value) =>
+                          themeController.changeTheme(value!),
+                    ),
+                  ],
                 ),
-                title: const Text("Dark Mode"),
-                subtitle: const Text("Enable dark theme"),
-                value: themeController.isDarkMode.value,
-                onChanged: (_) => themeController.toggleTheme(),
               ),
             ),
           ),
@@ -76,24 +127,14 @@ class _SettingsPageState extends State<SettingsPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            child: SwitchListTile(
-              secondary: const Icon(Icons.volume_up),
-              title: const Text("Button Sound"),
-              subtitle: const Text("Play sound when buttons are pressed"),
-              value: sound,
-              onChanged: (value) {
-                setState(() {
-                  sound = value;
-                });
-
-                Get.snackbar(
-                  "Updated",
-                  value
-                      ? "Sound Enabled"
-                      : "Sound Disabled",
-                  snackPosition: SnackPosition.BOTTOM,
-                );
-              },
+            child: Obx(
+                  () => SwitchListTile(
+                secondary: const Icon(Icons.volume_up),
+                title: const Text("Button Sound"),
+                subtitle: const Text("Play sound when buttons are pressed"),
+                value: settingsController.soundEnabled.value,
+                onChanged: settingsController.toggleSound,
+              ),
             ),
           ),
 
@@ -105,43 +146,47 @@ class _SettingsPageState extends State<SettingsPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18),
             ),
-            child: ListTile(
-              leading: const Icon(Icons.calculate),
-              title: const Text("Decimal Precision"),
-              subtitle: Text(decimal),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-              onTap: () async {
-                final value = await showDialog<String>(
-                  context: context,
-                  builder: (_) => SimpleDialog(
-                    title: const Text("Decimal Precision"),
-                    children: [
-                      SimpleDialogOption(
-                        onPressed: () => Navigator.pop(context, "Auto"),
-                        child: const Text("Auto"),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () => Navigator.pop(context, "2"),
-                        child: const Text("2"),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () => Navigator.pop(context, "4"),
-                        child: const Text("4"),
-                      ),
-                      SimpleDialogOption(
-                        onPressed: () => Navigator.pop(context, "6"),
-                        child: const Text("6"),
-                      ),
-                    ],
-                  ),
-                );
+            child: Obx(
+                  () => ListTile(
+                leading: const Icon(Icons.calculate),
+                title: const Text("Decimal Precision"),
+                subtitle: Text(
+                  settingsController.decimalPlaces.value == 0
+                      ? "Auto"
+                      : settingsController.decimalPlaces.value.toString(),
+                ),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 18),
+                onTap: () async {
+                  final int? value = await showDialog<int>(
+                    context: context,
+                    builder: (_) => SimpleDialog(
+                      title: const Text("Decimal Precision"),
+                      children: [
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 0),
+                          child: const Text("Auto"),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 2),
+                          child: const Text("2"),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 4),
+                          child: const Text("4"),
+                        ),
+                        SimpleDialogOption(
+                          onPressed: () => Navigator.pop(context, 6),
+                          child: const Text("6"),
+                        ),
+                      ],
+                    ),
+                  );
 
-                if (value != null) {
-                  setState(() {
-                    decimal = value;
-                  });
-                }
-              },
+                  if (value != null) {
+                    settingsController.setDecimal(value);
+                  }
+                },
+              ),
             ),
           ),
 

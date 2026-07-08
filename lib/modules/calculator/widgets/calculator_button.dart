@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:vibration/vibration.dart';
+
+import '../../../data/services/audio_service.dart';
+import '../../settings/controller/settings_controller.dart';
 
 class CalculatorButton extends StatefulWidget {
   final String text;
@@ -22,19 +26,49 @@ class CalculatorButton extends StatefulWidget {
 class _CalculatorButtonState extends State<CalculatorButton> {
   bool _pressed = false;
 
-  Future<void> _handleTap() async {
-    HapticFeedback.selectionClick();
+  late final SettingsController settingsController;
 
-    setState(() {
-      _pressed = true;
-    });
+  @override
+  void initState() {
+    super.initState();
+    settingsController = Get.find<SettingsController>();
+  }
+
+  Future<void> _handleTap() async {
+    debugPrint("Button: ${widget.text}");
+
+    // Haptic
+    if (settingsController.hapticEnabled.value) {
+      try {
+        final hasVibrator = await Vibration.hasVibrator();
+
+        debugPrint("Has Vibrator: $hasVibrator");
+
+        if (hasVibrator == true) {
+          await Vibration.vibrate(
+            duration: 50,
+          );
+        }
+      } catch (e) {
+        debugPrint("Vibration Error: $e");
+      }
+    }
+
+    // Sound
+    if (settingsController.soundEnabled.value) {
+      try {
+        await AudioService.instance.playClick();
+      } catch (e) {
+        debugPrint("Sound Error: $e");
+      }
+    }
+
+    setState(() => _pressed = true);
 
     await Future.delayed(const Duration(milliseconds: 80));
 
     if (mounted) {
-      setState(() {
-        _pressed = false;
-      });
+      setState(() => _pressed = false);
     }
 
     widget.onTap();
@@ -45,77 +79,48 @@ class _CalculatorButtonState extends State<CalculatorButton> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final buttonSize = constraints.maxWidth;
+    final Color backgroundColor;
+    final Color textColor;
 
-        Color backgroundColor;
-        Color textColor;
+    if (widget.isEqual) {
+      backgroundColor = theme.colorScheme.primary;
+      textColor = Colors.white;
+    } else if (widget.isOperator) {
+      backgroundColor = isDark
+          ? const Color(0xFF3A3D42)
+          : const Color(0xFFE8EAF6);
 
-        if (widget.isEqual) {
-          backgroundColor = theme.colorScheme.primary;
-          textColor = Colors.white;
-        } else if (widget.isOperator) {
-          backgroundColor = isDark
-              ? const Color(0xFF383B40)
-              : const Color(0xFFEDE7F6);
+      textColor = theme.colorScheme.primary;
+    } else {
+      backgroundColor =
+      isDark ? const Color(0xFF2C2C2C) : Colors.white;
 
-          textColor = theme.colorScheme.primary;
-        } else {
-          backgroundColor =
-          isDark ? const Color(0xFF2B2D31) : Colors.white;
+      textColor = isDark ? Colors.white : Colors.black87;
+    }
 
-          textColor = isDark ? Colors.white : Colors.black87;
-        }
-
-        return Padding(
-          padding: const EdgeInsets.all(2),
-          child: AnimatedScale(
-            duration: const Duration(milliseconds: 80),
-            curve: Curves.easeOut,
-            scale: _pressed ? 0.92 : 1,
-            child: Material(
-              color: Colors.transparent,
-              borderRadius: BorderRadius.circular(22),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(22),
-                onTap: _handleTap,
-                splashColor:
-                theme.colorScheme.primary.withOpacity(.15),
-                highlightColor: Colors.transparent,
-                child: Ink(
-                  decoration: BoxDecoration(
-                    color: backgroundColor,
-                    borderRadius: BorderRadius.circular(22),
-                    boxShadow: [
-                      if (!isDark)
-                        BoxShadow(
-                          color: Colors.black.withOpacity(.08),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
-                        ),
-                    ],
-                  ),
-                  child: SizedBox.expand(
-                    child: Center(
-                      child: FittedBox(
-                        child: Text(
-                          widget.text,
-                          style: TextStyle(
-                            fontSize: buttonSize * .28,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+    return AnimatedScale(
+      scale: _pressed ? 0.92 : 1,
+      duration: const Duration(milliseconds: 100),
+      child: Material(
+        color: backgroundColor,
+        elevation: isDark ? 0 : 3,
+        borderRadius: BorderRadius.circular(22),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(22),
+          splashColor: theme.colorScheme.primary.withOpacity(.15),
+          onTap: _handleTap,
+          child: Center(
+            child: Text(
+              widget.text,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                color: textColor,
               ),
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

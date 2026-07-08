@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 
+import '../../../data/services/number_formatter.dart';
+import '../../settings/controller/settings_controller.dart';
+
 
 class CalculatorDisplay extends StatelessWidget {
   final String expression;
@@ -21,6 +24,12 @@ class CalculatorDisplay extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final expressionFont = width > 600 ? 36.0 : 28.0;
     final resultFont = width > 600 ? 58.0 : 44.0;
+    final settings = Get.find<SettingsController>();
+
+    final formattedResult = NumberFormatter.format(
+      result,
+      decimalPlaces: settings.decimalPlaces.value,
+    );
 
     return Container(
       width: double.infinity,
@@ -78,7 +87,7 @@ class CalculatorDisplay extends StatelessWidget {
                   );
                 },
                 child: Text(
-                  result,
+                  formattedResult,
                   style: TextStyle(
                     fontSize: resultFont,
                     fontWeight: FontWeight.bold,

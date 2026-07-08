@@ -2,11 +2,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
 
+import '../../../data/services/export_service.dart';
 import '../../../data/services/models/history_model.dart';
+import '../../calculator/controller/calculator_controller.dart';
 
 class HistoryController extends GetxController {
   final Box _box = Hive.box('calculator_history');
-
+  final searchQuery = ''.obs;
   final RxList<HistoryModel> history = <HistoryModel>[].obs;
 
   @override
@@ -28,9 +30,16 @@ class HistoryController extends GetxController {
           expression: item['expression'] as String,
           result: item['result'] as String,
           time: DateTime.parse(item['time'] as String),
+          isFavorite: item['favorite'] ?? false,
         ),
       );
     }
+    history.sort((a, b) {
+      if (a.isFavorite == b.isFavorite) {
+        return b.time.compareTo(a.time);
+      }
+      return a.isFavorite ? -1 : 1;
+    });
   }
 
   //================ ADD HISTORY =================
@@ -40,6 +49,7 @@ class HistoryController extends GetxController {
       "expression": expression,
       "result": result,
       "time": DateTime.now().toIso8601String(),
+      "favorite": false,
     };
 
     _box.add(data);
@@ -108,5 +118,87 @@ class HistoryController extends GetxController {
     if (index < 0 || index >= history.length) return;
 
     Get.back(result: history[index].result);
+  }
+
+  //=========================use calcculation =====================
+  void useCalculation2(HistoryModel item) {
+    Get.back();
+
+    final calculator = Get.find<CalculatorController>();
+
+    calculator.expression.value = item.expression;
+    calculator.result.value = item.result;
+  }
+
+  //=============search history =======================
+  List<HistoryModel> get filteredHistory {
+    if (searchQuery.value.isEmpty) {
+      return history;
+    }
+
+    return history.where((item) {
+      return item.expression
+          .toLowerCase()
+          .contains(searchQuery.value.toLowerCase()) ||
+          item.result
+              .toLowerCase()
+              .contains(searchQuery.value.toLowerCase());
+    }).toList();
+  }
+
+  void toggleFavorite(HistoryModel item) {
+    final key = _box.keys.firstWhere(
+          (k) {
+        final data = _box.get(k);
+
+        return data['expression'] == item.expression &&
+            data['result'] == item.result &&
+            data['time'] == item.time.toIso8601String();
+      },
+    );
+
+    final data = Map<String, dynamic>.from(_box.get(key));
+
+    data['favorite'] = !(data['favorite'] ?? false);
+
+    _box.put(key, data);
+
+    loadHistory();
+  }
+
+  int get totalCalculations => history.length;
+
+  int get favoriteCalculations =>
+      history.where((e) => e.isFavorite).length;
+
+  int get todayCalculations {
+    final now = DateTime.now();
+
+    return history.where((e) {
+      return e.time.year == now.year &&
+          e.time.month == now.month &&
+          e.time.day == now.day;
+    }).length;
+  }
+
+  int get thisWeekCalculations {
+    final now = DateTime.now();
+
+    return history.where((e) {
+      return now.difference(e.time).inDays < 7;
+    }).length;
+  }
+
+  Future<void> exportHistory() async {
+    if (history.isEmpty) {
+      Get.snackbar(
+        "No History",
+        "Nothing to export.",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
+
+    await ExportService.exportHistory(history);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/services/calculator_service.dart';
 import '../../history/controller/history_controller.dart';
 
@@ -8,7 +9,6 @@ class CalculatorController extends GetxController {
 
   final RxString expression = ''.obs;
   final RxString result = '0'.obs;
-  final RxDouble memoryValue = 0.0.obs;
 
   static const List<String> _operators = ['+', '-', '×', '÷'];
 
@@ -32,21 +32,6 @@ class CalculatorController extends GetxController {
 
       case '%':
         percentage();
-        break;
-      case 'MC':
-        memoryClear();
-        break;
-
-      case 'MR':
-        memoryRecall();
-        break;
-
-      case 'M+':
-        memoryAdd();
-        break;
-
-      case 'M-':
-        memorySubtract();
         break;
 
     // Scientific Functions
@@ -181,28 +166,7 @@ class CalculatorController extends GetxController {
 
     _liveCalculate();
   }
-  void memoryClear() {
-    memoryValue.value = 0;
-  }
 
-  void memoryRecall() {
-    expression.value = memoryValue.value.toString();
-    result.value = expression.value;
-  }
-
-  void memoryAdd() {
-    final value = double.tryParse(result.value);
-    if (value != null) {
-      memoryValue.value += value;
-    }
-  }
-
-  void memorySubtract() {
-    final value = double.tryParse(result.value);
-    if (value != null) {
-      memoryValue.value -= value;
-    }
-  }
 
   //================ DECIMAL ===================
 
@@ -214,5 +178,14 @@ class CalculatorController extends GetxController {
     final number = index == -1 ? text : text.substring(index + 1);
 
     return number.contains('.');
+  }
+
+  void shareCalculation() {
+    if (expression.value.isEmpty) return;
+
+    Share.share(
+      "$expression = $result",
+      subject: "Calculator Result",
+    );
   }
 }

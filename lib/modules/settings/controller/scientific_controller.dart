@@ -1,9 +1,17 @@
 import 'package:get/get.dart';
 
 class ScientificController extends GetxController {
-  final isScientific = false.obs;
+  final isExpanded = false.obs;
 
   void toggle() {
-    isScientific.toggle();
+    isExpanded.toggle();
+  }
+
+  void open() {
+    isExpanded.value = true;
+  }
+
+  void close() {
+    isExpanded.value = false;
   }
 }

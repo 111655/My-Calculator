@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get_storage/get_storage.dart';
+
+import '../../../app/theme/app_theme.dart';
+import '../../../app/theme/app_theme_type.dart';
 
 class ThemeController extends GetxController {
-  final isDarkMode = false.obs;
+  static const String _themeKey = 'app_theme';
+
+  final GetStorage _storage = GetStorage();
+
+  final selectedTheme = AppThemeType.light.obs;
+
+  final currentTheme = AppTheme.lightTheme.obs;
 
   @override
   void onInit() {
@@ -11,28 +20,52 @@ class ThemeController extends GetxController {
     loadTheme();
   }
 
-  Future<void> loadTheme() async {
-    final prefs = await SharedPreferences.getInstance();
+  void loadTheme() {
+    final saved = _storage.read(_themeKey);
 
-    isDarkMode.value = prefs.getBool('darkMode') ?? false;
+    if (saved != null) {
+      selectedTheme.value = AppThemeType.values.firstWhere(
+            (e) => e.name == saved,
+        orElse: () => AppThemeType.light,
+      );
+    }
 
-    Get.changeThemeMode(
-      isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
-    );
+    _updateTheme();
   }
 
-  Future<void> toggleTheme() async {
-    isDarkMode.toggle();
+  void changeTheme(AppThemeType theme) {
+    selectedTheme.value = theme;
 
-    final prefs = await SharedPreferences.getInstance();
+    _storage.write(_themeKey, theme.name);
 
-    await prefs.setBool(
-      'darkMode',
-      isDarkMode.value,
-    );
+    _updateTheme();
+  }
 
-    Get.changeThemeMode(
-      isDarkMode.value ? ThemeMode.dark : ThemeMode.light,
-    );
+  void _updateTheme() {
+    switch (selectedTheme.value) {
+      case AppThemeType.light:
+        currentTheme.value = AppTheme.lightTheme;
+        break;
+
+      case AppThemeType.dark:
+        currentTheme.value = AppTheme.darkTheme;
+        break;
+
+      case AppThemeType.blue:
+        currentTheme.value = AppTheme.blueTheme;
+        break;
+
+      case AppThemeType.purple:
+        currentTheme.value = AppTheme.purpleTheme;
+        break;
+
+      case AppThemeType.green:
+        currentTheme.value = AppTheme.greenTheme;
+        break;
+
+      case AppThemeType.amoled:
+        currentTheme.value = AppTheme.amoledTheme;
+        break;
+    }
   }
 }
