@@ -1,17 +1,33 @@
 import 'package:get/get.dart';
 
 class ScientificController extends GetxController {
-  final isExpanded = false.obs;
+  /// Scientific mode state
+  final RxBool _isScientific = false.obs;
+
+  /// Getter
+  bool get isEnabled => _isScientific.value;
+
+  /// Observable
+  RxBool get isScientific => _isScientific;
+
+  //================ TOGGLE =================
 
   void toggle() {
-    isExpanded.toggle();
+    _isScientific.value = !_isScientific.value;
   }
 
-  void open() {
-    isExpanded.value = true;
+  //================ SET =================
+
+  void setScientific(bool value) {
+    if (_isScientific.value == value) return;
+    _isScientific.value = value;
   }
 
-  void close() {
-    isExpanded.value = false;
-  }
+  //================ ENABLE =================
+
+  void enable() => setScientific(true);
+
+  //================ DISABLE =================
+
+  void disable() => setScientific(false);
 }

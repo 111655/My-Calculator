@@ -54,50 +54,39 @@ class CalculatorDisplay extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               reverse: true,
               child: Text(
                 expression.isEmpty ? "0" : expression,
+                maxLines: 1,
                 style: TextStyle(
-                  fontSize: expressionFont,
-                  color: theme.colorScheme.onSurface.withOpacity(0.65),
-                  fontWeight: FontWeight.w500,
+                  fontSize: 20,
+                  color: theme.colorScheme.onSurface.withOpacity(.6),
                 ),
               ),
             ),
-            const SizedBox(height: 18),
+
+            const SizedBox(height: 6),
+
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               reverse: true,
-              child: GestureDetector(
-                onLongPress: () async {
-                  await Clipboard.setData(
-                    ClipboardData(text: result),
-                  );
-
-                  Get.snackbar(
-                    "Copied",
-                    "Result copied to clipboard",
-                    snackPosition: SnackPosition.BOTTOM,
-                    duration: const Duration(seconds: 2),
-                  );
-                },
-                child: Text(
-                  formattedResult,
-                  style: TextStyle(
-                    fontSize: resultFont,
-                    fontWeight: FontWeight.bold,
-                    color:theme.colorScheme.onSurface,
-                  ),
+              child: Text(
+                formattedResult,
+                maxLines: 1,
+                style: const TextStyle(
+                  fontSize: 38,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ],
-        ),
+        )
       ),
     );
   }

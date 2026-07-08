@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../../history/view/history_page.dart';
 import '../../settings/controller/scientific_controller.dart';
-import '../../settings/controller/theme_controller.dart';
 import '../../settings/view/settings_page.dart';
 import '../controller/calculator_controller.dart';
 import '../widgets/calculator_display.dart';
 import '../widgets/calculator_keypad.dart';
+import '../widgets/memory_bar.dart';
+import '../widgets/scientific_panel.dart';
 
 class CalculatorPage extends GetView<CalculatorController> {
   const CalculatorPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final themeController = Get.find<ThemeController>();
-    final scientificController = Get.find<ScientificController>();
     final isLandscape =
         MediaQuery.of(context).orientation == Orientation.landscape;
 
@@ -24,47 +24,36 @@ class CalculatorPage extends GetView<CalculatorController> {
         title: const Text("Calculator"),
         centerTitle: true,
         actions: [
-
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: controller.shareCalculation,
           ),
           IconButton(
             icon: const Icon(Icons.history),
-            onPressed: () {
-              Get.to(() => const HistoryPage());
-            },
+            onPressed: () => Get.to(() => const HistoryPage()),
           ),
           IconButton(
             icon: const Icon(Icons.settings),
-            onPressed: () {
-              Get.to(() => const SettingsPage());
-            },
+            onPressed: () => Get.to(() => const SettingsPage()),
           ),
         ],
       ),
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final isTablet = constraints.maxWidth >= 600;
-
-            return Padding(
-              padding: EdgeInsets.all(isTablet ? 24 : 16),
-              child: isLandscape
-                  ? _buildLandscape(context, isTablet)
-                  : _buildPortrait(context, isTablet),
-            );
-          },
-        ),
+        child: isLandscape
+            ? _buildLandscape(context)
+            : _buildPortrait(context),
       ),
     );
   }
 
-  Widget _buildPortrait(BuildContext context, bool isTablet) {
+  Widget _buildPortrait(BuildContext context) {
+    final scientific = Get.find<ScientificController>();
+
     return Column(
       children: [
-        Expanded(
-          flex: 3,
+        // Fixed Display
+        SizedBox(
+          height: 160,
           child: Obx(
                 () => CalculatorDisplay(
               expression: controller.expression.value,
@@ -73,38 +62,93 @@ class CalculatorPage extends GetView<CalculatorController> {
           ),
         ),
 
-        const SizedBox(height: 12),
-
+        // Fixed Memory Bar
+        const SizedBox(height: 4),
+        const MemoryBar(),
+        const SizedBox(height: 3),
+        // Remaining Area
         Expanded(
-          flex: 7,
-          child: CalculatorKeypad(
-            isTablet: isTablet,
-          ),
+          child: Obx(() {
+            final showScientific = scientific.isScientific.value;
+
+            return Column(
+              children: [
+
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  height: showScientific ? 180 : 0,
+                  child: showScientific
+                      ? const ScientificPanel()
+                      : const SizedBox.shrink(),
+                ),
+
+                if (showScientific)
+                  const SizedBox(height: 8),
+
+                const Expanded(
+                  child: CalculatorKeypad(),
+                ),
+              ],
+            );
+          }),
         ),
       ],
     );
   }
 
-  Widget _buildLandscape(BuildContext context, bool isTablet) {
+  Widget _buildLandscape(BuildContext context) {
+    final scientific = Get.find<ScientificController>();
+
     return Row(
       children: [
+
         Expanded(
           flex: 4,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Obx(
-                  () => CalculatorDisplay(
-                expression: controller.expression.value,
-                result: controller.result.value,
-              ),
+          child: Obx(
+                () => CalculatorDisplay(
+              expression: controller.expression.value,
+              result: controller.result.value,
             ),
           ),
         ),
 
+        const SizedBox(width: 12),
+
         Expanded(
           flex: 6,
-          child: CalculatorKeypad(
-            isTablet: isTablet,
+          child: Column(
+            children: [
+
+              const MemoryBar(),
+
+              const SizedBox(height: 8),
+
+              Expanded(
+                child: Obx(() {
+                  final showScientific = scientific.isScientific.value;
+
+                  return Row(
+                    children: [
+
+                      if (showScientific)
+                        Expanded(
+                          flex: 4,
+                          child: const ScientificPanel(),
+                        ),
+
+                      if (showScientific)
+                        const SizedBox(width: 8),
+
+                      const Expanded(
+                        flex: 6,
+                        child: CalculatorKeypad(),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ],
           ),
         ),
       ],

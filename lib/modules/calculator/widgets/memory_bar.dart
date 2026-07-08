@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../settings/controller/scientific_controller.dart';
 import '../controller/calculator_controller.dart';
 import '../controller/memory_controller.dart';
 
@@ -9,17 +10,28 @@ class MemoryBar extends GetView<CalculatorController> {
 
   @override
   Widget build(BuildContext context) {
-    final memoryController = Get.find<MemoryController>();
+    final memory = Get.find<MemoryController>();
+    final scientific = Get.find<ScientificController>();
     final theme = Theme.of(context);
 
-    Widget buildButton(String text, VoidCallback onTap) {
+    Widget button({
+      required String text,
+      required VoidCallback onTap,
+      bool selected = false,
+    }) {
       return Expanded(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: OutlinedButton(
+          child: FilledButton.tonal(
             onPressed: onTap,
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+            style: FilledButton.styleFrom(
+              backgroundColor: selected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.surface,
+              foregroundColor: selected
+                  ? theme.colorScheme.onPrimary
+                  : theme.colorScheme.onSurface,
+              minimumSize: const Size(0, 42),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -36,61 +48,59 @@ class MemoryBar extends GetView<CalculatorController> {
     }
 
     return Obx(
-          () => Card(
-        elevation: 0,
-        color: theme.cardColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            children: [
-              if (memoryController.hasMemory)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
-                    "Memory : ${memoryController.memory.value}",
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+          () => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        child: Row(
+          children: [
+            button(
+              text: "MC",
+              onTap: memory.clear,
+            ),
 
-              Row(
-                children: [
-                  buildButton("MC", () {
-                    memoryController.clear();
-                  }),
+            button(
+              text: "MR",
+              selected: memory.hasMemory,
+              onTap: () {
+                controller.expression.value =
+                    memory.recall().toString();
+                controller.result.value =
+                    memory.recall().toString();
+              },
+            ),
 
-                  buildButton("MR", () {
-                    controller.onButtonPressed(
-                      memoryController.recall().toString(),
-                    );
-                  }),
+            button(
+              text: "MS",
+              onTap: () {
+                memory.store(
+                  double.tryParse(controller.result.value) ?? 0,
+                );
+              },
+            ),
 
-                  buildButton("MS", () {
-                    memoryController.store(
-                      double.tryParse(controller.result.value) ?? 0,
-                    );
-                  }),
+            button(
+              text: "M+",
+              onTap: () {
+                memory.add(
+                  double.tryParse(controller.result.value) ?? 0,
+                );
+              },
+            ),
 
-                  buildButton("M+", () {
-                    memoryController.add(
-                      double.tryParse(controller.result.value) ?? 0,
-                    );
-                  }),
+            button(
+              text: "M-",
+              onTap: () {
+                memory.subtract(
+                  double.tryParse(controller.result.value) ?? 0,
+                );
+              },
+            ),
 
-                  buildButton("M-", () {
-                    memoryController.subtract(
-                      double.tryParse(controller.result.value) ?? 0,
-                    );
-                  }),
-                ],
-              ),
-            ],
-          ),
+            button(
+              text: "ƒx",
+              selected: scientific.isScientific.value,
+              onTap: scientific.toggle,
+            ),
+          ],
         ),
       ),
     );
