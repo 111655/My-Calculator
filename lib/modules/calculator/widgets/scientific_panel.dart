@@ -44,15 +44,15 @@ class ScientificPanel extends GetView<CalculatorController> {
           final rows =
           (scientificButtons.length / crossAxisCount).ceil();
 
-          final buttonWidth =
-              (constraints.maxWidth -
-                  spacing * (crossAxisCount - 1)) /
-                  crossAxisCount;
-
-          final buttonHeight =
-              (constraints.maxHeight -
-                  spacing * (rows - 1)) /
-                  rows;
+          // final buttonWidth =
+          //     (constraints.maxWidth -
+          //         spacing * (crossAxisCount - 1)) /
+          //         crossAxisCount;
+          //
+          // final buttonHeight =
+          //     (constraints.maxHeight -
+          //         spacing * (rows - 1)) /
+          //         rows;
 
           return GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
