@@ -10,6 +10,7 @@ class CalculatorButton extends StatefulWidget {
   final VoidCallback onTap;
   final bool isOperator;
   final bool isEqual;
+  final double? fontSize;
 
   const CalculatorButton({
     super.key,
@@ -17,6 +18,7 @@ class CalculatorButton extends StatefulWidget {
     required this.onTap,
     this.isOperator = false,
     this.isEqual = false,
+    this.fontSize,
   });
 
   @override
@@ -113,7 +115,7 @@ class _CalculatorButtonState extends State<CalculatorButton> {
             child: Text(
               widget.text,
               style: TextStyle(
-                fontSize: 28,
+                fontSize: 23,
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),

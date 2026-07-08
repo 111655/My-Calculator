@@ -10,32 +10,42 @@ class CalculatorKeypad extends GetView<CalculatorController> {
 
   @override
   Widget build(BuildContext context) {
-    final isTablet = MediaQuery.of(context).size.width >= 600;
+    final media = MediaQuery.of(context);
+
+    final isTablet = media.size.width >= 600;
+    final isLandscape =
+        media.orientation == Orientation.landscape;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final spacing = isTablet ? 12.0 : 8.0;
+        final spacing = isLandscape ? 10.0 : 8.0;
 
         const columns = 4;
         final rows = (buttons.length / columns).ceil();
 
         final buttonWidth =
-            (constraints.maxWidth - (columns - 1) * spacing) / columns;
+            (constraints.maxWidth - spacing * (columns - 1)) / columns;
 
         final buttonHeight =
-            (constraints.maxHeight - (rows - 1) * spacing) / rows;
+            (constraints.maxHeight - spacing * (rows - 1)) / rows;
+
+        // Portrait uses your existing design.
+        // Landscape adapts to available space.
+        final aspectRatio = isLandscape
+            ? (isTablet ? 1.35 : 1.15)
+            : buttonWidth / buttonHeight;
 
         return GridView.builder(
-          padding: EdgeInsets.zero,
           physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
           itemCount: buttons.length,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: columns,
             crossAxisSpacing: spacing,
             mainAxisSpacing: spacing,
-            childAspectRatio: buttonWidth / buttonHeight,
+            childAspectRatio: aspectRatio,
           ),
-          itemBuilder: (context, index) {
+          itemBuilder: (_, index) {
             final button = buttons[index];
 
             return CalculatorButton(
@@ -50,3 +60,46 @@ class CalculatorKeypad extends GetView<CalculatorController> {
     );
   }
 }
+
+// @override
+// Widget build(BuildContext context) {
+//   final isTablet = MediaQuery.of(context).size.width >= 600;
+//
+//   return LayoutBuilder(
+//     builder: (context, constraints) {
+//       final spacing = isTablet ? 12.0 : 8.0;
+//
+//       const columns = 4;
+//       final rows = (buttons.length / columns).ceil();
+//
+//       final buttonWidth =
+//           (constraints.maxWidth - (columns - 1) * spacing) / columns;
+//
+//       final buttonHeight =
+//           (constraints.maxHeight - (rows - 1) * spacing) / rows;
+//
+//       return GridView.builder(
+//         padding: EdgeInsets.zero,
+//         physics: const NeverScrollableScrollPhysics(),
+//         itemCount: buttons.length,
+//         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+//           crossAxisCount: columns,
+//           crossAxisSpacing: spacing,
+//           mainAxisSpacing: spacing,
+//           childAspectRatio: buttonWidth / buttonHeight,
+//         ),
+//         itemBuilder: (context, index) {
+//           final button = buttons[index];
+//
+//           return CalculatorButton(
+//             text: button.text,
+//             isOperator: button.isOperator && button.text != "=",
+//             isEqual: button.text == "=",
+//             onTap: () => controller.onButtonPressed(button.text),
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
+// }

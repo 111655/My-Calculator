@@ -158,12 +158,6 @@ class HistoryPage extends GetView<HistoryController> {
 
                   onDismissed: (_) {
                     controller.deleteHistory(index);
-
-                    Get.snackbar(
-                      "Deleted",
-                      "Calculation removed",
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
                   },
 
                   child: Card(

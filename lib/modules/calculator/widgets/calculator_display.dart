@@ -65,7 +65,7 @@ class CalculatorDisplay extends StatelessWidget {
                 expression.isEmpty ? "0" : expression,
                 maxLines: 1,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 28,
                   color: theme.colorScheme.onSurface.withOpacity(.6),
                 ),
               ),
