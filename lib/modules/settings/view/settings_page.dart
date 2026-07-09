@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../app/theme/app_theme_type.dart';
+import '../../../data/services/url_launcher_service.dart';
+import '../../about/controller/about_controller.dart';
+import '../../about/view/about_page.dart';
 import '../controller/settings_controller.dart';
 import '../controller/theme_controller.dart';
 
@@ -14,6 +17,9 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+
+  final AboutController controller = Get.put(AboutController());
+
   final ThemeController themeController = Get.find<ThemeController>();
   final settingsController = Get.find<SettingsController>();
   @override
@@ -221,26 +227,13 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
 
           /// Privacy Policy
+          /// Privacy Policy
           ListTile(
             leading: const Icon(Icons.privacy_tip),
             title: const Text("Privacy Policy"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-            onTap: () {
-              Get.dialog(
-                AlertDialog(
-                  title: const Text("Privacy Policy"),
-                  content: const Text(
-                    "This calculator stores your calculation history only on your device. "
-                        "No personal information is collected or shared.",
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Get.back(),
-                      child: const Text("OK"),
-                    ),
-                  ],
-                ),
-              );
+            onTap: () async {
+              await UrlLauncherService.openPrivacyPolicy();
             },
           ),
 
@@ -248,15 +241,9 @@ class _SettingsPageState extends State<SettingsPage> {
           ListTile(
             leading: const Icon(Icons.info_outline),
             title: const Text("About"),
-            subtitle: const Text("Version 1.0.0"),
             trailing: const Icon(Icons.arrow_forward_ios, size: 18),
             onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: "My Calculator",
-                applicationVersion: "1.0.0",
-                applicationLegalese: "© 2026 Arvind Kumar",
-              );
+              Get.to(() => AboutPage());
             },
           ),
 

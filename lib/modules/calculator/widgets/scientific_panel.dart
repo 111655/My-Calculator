@@ -20,11 +20,11 @@ class ScientificPanel extends GetView<CalculatorController> {
 
     final isTablet = media.size.width >= 600;
 
-    final spacing = isTablet ? 10.0 : 6.0;
+    final spacing = isTablet ? 12.0 : 10.0;
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(isLandscape ? 6 : 5),
+      padding: EdgeInsets.all(isLandscape ? 10 : 5),
       margin: EdgeInsets.only(bottom: isLandscape ? 0 : 0),
       decoration: BoxDecoration(
         color: theme.cardColor,
@@ -39,7 +39,7 @@ class ScientificPanel extends GetView<CalculatorController> {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final crossAxisCount = isLandscape ? 3 : 5;
+          final crossAxisCount = isLandscape ? 5 : 5;
 
           // final rows =
           // (scientificButtons.length / crossAxisCount).ceil();

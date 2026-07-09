@@ -22,7 +22,8 @@ class CalculatorDisplay extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final settings = Get.find<SettingsController>();
-
+    final isLandscape =
+        MediaQuery.of(context).orientation == Orientation.landscape;
     final formattedResult = NumberFormatter.format(
       result,
       decimalPlaces: settings.decimalPlaces.value,
@@ -30,9 +31,10 @@ class CalculatorDisplay extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 24,
-        vertical: 24,
+      padding: isLandscape ? const EdgeInsets.only(
+        left: 10,right: 10,top: 2,bottom: 0
+      ) : const EdgeInsets.only(
+          left: 10,right: 10,top: 5,bottom: 5
       ),
       decoration: BoxDecoration(
         color: isDark
@@ -68,7 +70,7 @@ class CalculatorDisplay extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 6),
+            const SizedBox(height: 2),
 
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,

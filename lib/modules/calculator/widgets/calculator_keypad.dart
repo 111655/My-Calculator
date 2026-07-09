@@ -18,7 +18,7 @@ class CalculatorKeypad extends GetView<CalculatorController> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final spacing = isLandscape ? 10.0 : 8.0;
+        final spacing = isLandscape ? 10.0 : 10.0;
 
         const columns = 4;
         final rows = (buttons.length / columns).ceil();

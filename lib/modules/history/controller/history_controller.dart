@@ -22,14 +22,15 @@ class HistoryController extends GetxController {
   void loadHistory() {
     history.clear();
 
-    final items = _box.values.toList().reversed;
+    for (final key in _box.keys.toList().reversed) {
+      final item = _box.get(key);
 
-    for (final item in items) {
       history.add(
         HistoryModel(
-          expression: item['expression'] as String,
-          result: item['result'] as String,
-          time: DateTime.parse(item['time'] as String),
+          hiveKey: key,
+          expression: item['expression'],
+          result: item['result'],
+          time: DateTime.parse(item['time']),
           isFavorite: item['favorite'] ?? false,
         ),
       );
@@ -45,23 +46,16 @@ class HistoryController extends GetxController {
   //================ ADD HISTORY =================
 
   void addHistory(String expression, String result) {
-    final data = {
+    final now = DateTime.now();
+
+    _box.add({
       "expression": expression,
       "result": result,
-      "time": DateTime.now().toIso8601String(),
+      "time": now.toIso8601String(),
       "favorite": false,
-    };
+    });
 
-    _box.add(data);
-
-    history.insert(
-      0,
-      HistoryModel(
-        expression: expression,
-        result: result,
-        time: DateTime.now(),
-      ),
-    );
+    loadHistory();
   }
 
   //================ DELETE HISTORY =================
@@ -71,7 +65,7 @@ class HistoryController extends GetxController {
 
     final key = _box.keyAt(_box.length - 1 - index);
 
-    _box.delete(key);
+    _box.delete(history[index].hiveKey);
 
     history.removeAt(index);
 
@@ -147,24 +141,29 @@ class HistoryController extends GetxController {
   }
 
   void toggleFavorite(HistoryModel item) {
-    final key = _box.keys.firstWhere(
-          (k) {
-        final data = _box.get(k);
+    final raw = _box.get(item.hiveKey);
 
-        return data['expression'] == item.expression &&
-            data['result'] == item.result &&
-            data['time'] == item.time.toIso8601String();
-      },
-    );
+    if (raw == null) {
+      Get.snackbar(
+        "Error",
+        "History record not found",
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
+    }
 
-    final data = Map<String, dynamic>.from(_box.get(key));
+    final data = Map<String, dynamic>.from(raw);
 
-    data['favorite'] = !(data['favorite'] ?? false);
+    data["favorite"] = !(data["favorite"] ?? false);
 
-    _box.put(key, data);
+    _box.put(item.hiveKey, data);
 
     loadHistory();
   }
+
+
+
+  //=================================================
 
   int get totalCalculations => history.length;
 

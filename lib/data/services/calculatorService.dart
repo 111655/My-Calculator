@@ -21,12 +21,17 @@ class CalculatorService {
         ContextModel(),
       );
 
-      if (result.isNaN || result.isInfinite) {
+      if (result.isInfinite) {
+        return "Cannot divide by 0";
+      }
+
+      if (result.isNaN) {
         return "Error";
       }
 
       return format(result);
-    } catch (_) {
+    }
+    catch (e) {
       return "Error";
     }
   }

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-
-import 'app/theme/app_theme.dart';
 import 'modules/calculator/bindings/calculator_binding.dart';
 import 'modules/calculator/controller/memory_controller.dart';
 import 'modules/calculator/view/calculator_page.dart';
@@ -43,7 +41,7 @@ class MyCalculatorApp extends StatelessWidget {
 
         initialBinding: CalculatorBinding(),
 
-        home: const CalculatorPage(),
+            home: const CalculatorPage(),
       ),
     );
   }

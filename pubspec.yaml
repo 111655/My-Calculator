@@ -59,8 +59,11 @@ dependencies:
   vibration: ^3.1.3
   function_tree: ^0.9.1
   get_storage: ^2.1.1
-  share_plus: ^10.0.2
+  share_plus: ^11.0.0
   path_provider: ^2.1.5
+  url_launcher: ^6.3.2
+  package_info_plus: ^8.0.2
+  in_app_review: ^2.0.10
 
 
 dev_dependencies:
@@ -125,25 +128,21 @@ flutter_launcher_icons:
   android: true
   ios: true
 
-  image_path: assets/images/calculator_logo_.png
+  image_path: assets/images/appicon.png
 
-  adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: assets/images/calculator_logo_.png
+  adaptive_icon_background: "#2563EB"
+  adaptive_icon_foreground: assets/images/appicon.png
 
 
 flutter_native_splash:
-  color: "#FFFFFF"
-#  color_dark: "#FFFFFF"
+  color: "#1565C0"
 
-  image: assets/images/calculator_logo.png
-#  image_dark: assets/images/calculator_logo.png
+  image: assets/images/appicon.png
 
   android: true
   ios: true
   web: false
 
   android_12:
-    color: "#FFFFFF"
-#    color_dark: "#FFFFFF"
-    image: assets/images/calculator_logo.png
-#    image_dark: assets/images/calculator_logo.png
+    color: "#1565C0"
+    image: assets/images/appicon.png

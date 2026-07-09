@@ -21,7 +21,7 @@ class CalculatorPage extends GetView<CalculatorController> {
     final theme = Theme.of(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
+      appBar: isLandscape ? null : AppBar(
         title: const Text("My Calculator"),
         titleTextStyle: TextStyle(
           fontWeight: FontWeight.bold,
@@ -30,7 +30,6 @@ class CalculatorPage extends GetView<CalculatorController> {
         ),
         centerTitle: false,
         actions: [
-          if (isLandscape) ...[MemoryActions(), const SizedBox(width: 70)],
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: controller.shareCalculation,
@@ -44,7 +43,7 @@ class CalculatorPage extends GetView<CalculatorController> {
             onPressed: () => Get.to(() => const SettingsPage()),
           ),
         ],
-      ),
+      ) ,
       body: SafeArea(
         child: isLandscape ? _buildLandscape(context) : _buildPortrait(context),
       ),
@@ -107,29 +106,29 @@ class CalculatorPage extends GetView<CalculatorController> {
       child: Row(
         children: [
           Expanded(
-            flex: 3,
-            child: Obx(
-              () => CalculatorDisplay(
-                expression: controller.expression.value,
-                result: controller.result.value,
-              ),
-            ),
-          ),
-          SizedBox(width: 10),
-          Expanded(
             flex: 7,
-            child: Row(
+            child: Column(
               children: [
-                Expanded(flex: 6, child: ScientificPanel(isLandscape: true)),
-
-                const SizedBox(width: 20),
-
-                const Expanded(flex: 6, child: CalculatorKeypad()),
+                Expanded(
+                  flex: 2,
+                  child: Obx(
+                    () => CalculatorDisplay(
+                      expression: controller.expression.value,
+                      result: controller.result.value,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 3),
+                const MemoryBar(),
+                SizedBox(height: 3),
+                Expanded(flex: 3, child: ScientificPanel(isLandscape: true)),
               ],
             ),
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(width: 20),
+          const Expanded(flex: 5, child: CalculatorKeypad()),
+          const SizedBox(width: 10),
         ],
       ),
     );

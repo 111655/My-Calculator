@@ -37,7 +37,7 @@ class _CalculatorButtonState extends State<CalculatorButton> {
   }
 
   Future<void> _handleTap() async {
-    debugPrint("Button: ${widget.text}");
+    //debugPrint("Button: ${widget.text}");
 
     // Haptic
     if (settingsController.hapticEnabled.value) {

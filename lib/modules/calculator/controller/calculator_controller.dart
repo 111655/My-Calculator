@@ -138,12 +138,12 @@ class CalculatorController extends GetxController {
   //================ LIVE RESULT =================
 
   void _liveCalculate() {
-    final value =
-    _service.evaluate(expression.value);
+    final value = _service.evaluate(expression.value);
 
-    if (value != "Error") {
-      result.value = value;
-    }
+    // Don't update for incomplete expressions
+    if (value == "Error") return;
+
+    result.value = value;
   }
 
   //================ VALIDATE =================
